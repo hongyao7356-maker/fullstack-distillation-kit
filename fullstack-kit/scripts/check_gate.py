@@ -18,22 +18,8 @@ def good_doc(path:Path)->bool:
 
 
 def evidence_ok(project:Path,phase:str,kind:str)->bool:
-    evidence_dir=project/".fullstack"/"evidence"
-    if not evidence_dir.is_dir(): return False
-    for p in sorted(evidence_dir.glob("*.json")):
-        try:
-            obj=json.loads(p.read_text(encoding="utf-8"))
-            if obj.get("phase")!=phase or obj.get("kind")!=kind or obj.get("exit_code")!=0 or obj.get("timed_out") is not False: continue
-            log=obj.get("log","")
-            if not isinstance(log,str): continue
-            candidate=(project/log).resolve()
-            if not candidate.is_relative_to((project/".fullstack"/"checks").resolve()): continue
-            if not candidate.is_file(): continue
-            h=hashlib.sha256(candidate.read_bytes()).hexdigest()
-            if h==obj.get("log_sha256") and len(h)==64: return True
-        except (ValueError,OSError,TypeError,AttributeError):
-            continue
-    return False
+    from evidence_engine import valid_evidence
+    return valid_evidence(project,phase,kind)
 
 
 def check_gate(project:Path,phase:str,policy:dict)->list[str]:
