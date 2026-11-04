@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fullstack Principle Card",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "source_id",
+    "source_url",
+    "claim",
+    "classification",
+    "status",
+    "confidence",
+    "conditions",
+    "anti_patterns",
+    "verify",
+    "phase",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 6
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 20
+    },
+    "classification": {
+      "enum": [
+        "author_statement",
+        "repository_observation",
+        "engineering_inference"
+      ]
+    },
+    "status": {
+      "enum": [
+        "verified",
+        "candidate",
+        "contradicted"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "anti_patterns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "verify": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "phase": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "observed_at",
+        "revision",
+        "locator"
+      ],
+      "properties": {
+        "observed_at": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "string"
+        },
+        "locator": {
+          "type": "string"
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

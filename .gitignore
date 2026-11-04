@@ -1,0 +1,13 @@
+work/**
+!work/verify_delivery.py
+!work/audit_workflow.py
+outputs/
+.fullstack/
+__pycache__/
+*.py[cod]
+.env*
+*.pem
+*.key
+*.pfx
+node_modules/
+.venv/

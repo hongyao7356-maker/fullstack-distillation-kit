@@ -1,0 +1,29 @@
+{
+  "id": "epic-engineering-baseline",
+  "title": "全栈项目应包含工程验证基础设施",
+  "source_id": "kent-epic",
+  "source_url": "https://github.com/epicweb-dev/epic-stack",
+  "claim": "Epic Stack 是可用于生产基础建设的全栈应用起点，仓库包含测试、工作流及部署相关配置；复用时应按自身项目逐项验证，而非假设模板本身证明服务已经满足全部生产要求。",
+  "classification": "repository_observation",
+  "status": "verified",
+  "confidence": "B",
+  "conditions": [
+    "目标是长期维护的全栈服务",
+    "能够按本项目环境运行测试与构建"
+  ],
+  "anti_patterns": [
+    "未经验证直接复制全部依赖",
+    "只检查项目文件存在就宣布 CI 和部署正常"
+  ],
+  "verify": [
+    "检查仓库配置是否包含测试与部署相关脚本",
+    "在目标项目隔离环境实际运行对应命令并记录退出码"
+  ],
+  "phase": "P4",
+  "provenance": {
+    "observed_at": "2026-11-04",
+    "revision": "unversioned mutable README",
+    "locator": "repository root README and project tree"
+  },
+  "notes": "仅基于公开仓库说明与可见目录；不宣称已运行 Epic Stack 本身。"
+}

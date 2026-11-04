@@ -1,0 +1,121 @@
+{
+  "version": "1.0.0",
+  "retrieved_date": "2026-11-04",
+  "policy": "metadata-and-public-links-only; do-not-copy-paywalled-content",
+  "sources": [
+    {
+      "id": "kent-epic",
+      "person": "Kent C. Dodds / contributors",
+      "type": "official_repo",
+      "url": "https://github.com/epicweb-dev/epic-stack",
+      "purpose": [
+        "engineering_baseline",
+        "tests",
+        "deployment"
+      ],
+      "evidence": "public official repo README; branch mutable",
+      "access": "public",
+      "license": "check current repo LICENSE before copying code",
+      "review_status": "entry_verified"
+    },
+    {
+      "id": "kent-epic-docs",
+      "person": "Kent C. Dodds / contributors",
+      "type": "official_docs",
+      "url": "https://www.epicweb.dev/epic-stack",
+      "purpose": [
+        "architecture",
+        "production_setup"
+      ],
+      "evidence": "official documentation landing",
+      "access": "public-site/may-have-paid-material",
+      "license": "do not copy proprietary lessons",
+      "review_status": "entry_verified"
+    },
+    {
+      "id": "antonio-github",
+      "person": "Antonio Erdeljac",
+      "type": "author_profile",
+      "url": "https://github.com/AntonioErdeljac",
+      "purpose": [
+        "project_build_sequence",
+        "implementation"
+      ],
+      "evidence": "public author GitHub; select and verify a specific repo before deriving rules",
+      "access": "public",
+      "license": "per-repository",
+      "review_status": "entry_verified"
+    },
+    {
+      "id": "antonio-video",
+      "person": "Antonio Erdeljac",
+      "type": "author_channel",
+      "url": "https://www.youtube.com/@codewithantonio",
+      "purpose": [
+        "recorded_full_builds"
+      ],
+      "evidence": "channel landing; no videos transcribed in this pack",
+      "access": "public/mixed",
+      "license": "view under platform and creator terms; no mass transcripts",
+      "review_status": "research_queue"
+    },
+    {
+      "id": "steven-dub",
+      "person": "Steven Tey / Dub contributors",
+      "type": "official_repo",
+      "url": "https://github.com/dubinc/dub.link",
+      "purpose": [
+        "product_iteration",
+        "issues",
+        "pull_requests"
+      ],
+      "evidence": "public product repo; do not infer a single person's decisions from aggregate commits",
+      "access": "public",
+      "license": "check repo license by path/version; do not redistribute blindly",
+      "review_status": "entry_verified"
+    },
+    {
+      "id": "theo-t3",
+      "person": "Theo Browne / T3 contributors",
+      "type": "official_repo",
+      "url": "https://github.com/t3-oss/create-t3-app",
+      "purpose": [
+        "technology_choice",
+        "typesafety",
+        "modularity"
+      ],
+      "evidence": "public project README/T3 axioms",
+      "access": "public",
+      "license": "check repository LICENSE",
+      "review_status": "entry_verified"
+    },
+    {
+      "id": "openai-skills",
+      "person": "OpenAI",
+      "type": "official_docs",
+      "url": "https://developers.openai.com/codex/skills",
+      "purpose": [
+        "codex_skill_format"
+      ],
+      "evidence": "Codex skill specs",
+      "access": "public",
+      "license": "documentation terms",
+      "review_status": "entry_verified"
+    },
+    {
+      "id": "openai-workflow",
+      "person": "OpenAI",
+      "type": "official_guide",
+      "url": "https://developers.openai.com/cookbook/examples/codex/iterating-development-workflows-with-codex",
+      "purpose": [
+        "harness",
+        "artifact_ownership",
+        "incremental_delivery"
+      ],
+      "evidence": "published Codex workflow example",
+      "access": "public",
+      "license": "documentation terms",
+      "review_status": "entry_verified"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "project_name": "TO_BE_CONFIRMED",
+  "project_type": "generic_fullstack",
+  "goal": "TO_BE_CONFIRMED",
+  "stack": {
+    "frontend": "unknown",
+    "backend": "unknown",
+    "database": "unknown",
+    "test_runner": "unknown",
+    "build_runner": "unknown"
+  },
+  "users": [],
+  "trusted_sources": [],
+  "constraints": [],
+  "risks": [],
+  "production_deploy_authorized": false,
+  "external_write_authorized": false,
+  "owner_decisions_pending": [
+    "confirm project goals, users, deployment environment, authentication requirements"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "P0": {
+    "purpose": "需求",
+    "docs": [
+      "00_requirements.md",
+      "00_acceptance.md"
+    ],
+    "checks": []
+  },
+  "P1": {
+    "purpose": "架构",
+    "docs": [
+      "01_architecture.md",
+      "01_adr.md",
+      "01_threat_model.md"
+    ],
+    "checks": []
+  },
+  "P2": {
+    "purpose": "数据权限",
+    "docs": [
+      "02_data_model.md",
+      "02_migrations.md",
+      "02_authz_matrix.md"
+    ],
+    "checks": []
+  },
+  "P3": {
+    "purpose": "实现",
+    "docs": [
+      "03_api_contract.md",
+      "03_feature_matrix.md",
+      "03_error_handling.md"
+    ],
+    "checks": []
+  },
+  "P4": {
+    "purpose": "质量",
+    "docs": [
+      "04_test_plan.md"
+    ],
+    "checks": [
+      "test",
+      "lint"
+    ]
+  },
+  "P5": {
+    "purpose": "安全",
+    "docs": [
+      "05_security_review.md"
+    ],
+    "checks": []
+  },
+  "P6": {
+    "purpose": "交付",
+    "docs": [
+      "06_deploy_plan.md",
+      "06_rollback.md"
+    ],
+    "checks": [
+      "build"
+    ]
+  },
+  "P7": {
+    "purpose": "运维",
+    "docs": [
+      "07_monitoring.md",
+      "07_runbook.md"
+    ],
+    "checks": []
+  }
+}

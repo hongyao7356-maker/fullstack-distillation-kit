@@ -1,0 +1,40 @@
+{
+  "project_name": "Digital Employee (draft)",
+  "project_type": "digital_employee",
+  "goal": "Help authorized staff respond to customer queries using approved cloud documents; draft-only until explicitly authorized",
+  "stack": {
+    "frontend": "unknown",
+    "backend": "unknown",
+    "database": "unknown",
+    "test_runner": "unknown",
+    "build_runner": "unknown"
+  },
+  "users": [
+    "customer",
+    "human_support",
+    "admin"
+  ],
+  "trusted_sources": [
+    "Tencent Docs/WPS/Online Excel (unverified configuration)"
+  ],
+  "constraints": [
+    "ordinary personal-WeChat groups; platform integration legitimacy must be verified",
+    "access controls must be enforced outside the LLM",
+    "human approval required before customer-facing automatic messages"
+  ],
+  "risks": [
+    "accidental cross-customer disclosure",
+    "unofficial client automation instability",
+    "stale prices",
+    "duplicate or dropped events"
+  ],
+  "production_deploy_authorized": false,
+  "external_write_authorized": false,
+  "owner_decisions_pending": [
+    "channel and API legitimacy",
+    "customer identity mapping",
+    "pricing permission matrix",
+    "human escalation rules",
+    "cloud provider auth and callback configuration"
+  ]
+}

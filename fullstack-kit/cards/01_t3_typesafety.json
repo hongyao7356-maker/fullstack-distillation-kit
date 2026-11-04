@@ -1,0 +1,29 @@
+{
+  "id": "t3-end-to-end-typesafety",
+  "title": "类型安全作为全栈接口约束",
+  "source_id": "theo-t3",
+  "source_url": "https://github.com/t3-oss/create-t3-app",
+  "claim": "T3 项目公开文档把端到端类型安全列为明确原则；在适配 TypeScript 全栈项目时应优先保持前后端类型契约一致，但不能把该原则硬套到不共享类型系统的语言栈。",
+  "classification": "author_statement",
+  "status": "verified",
+  "confidence": "B",
+  "conditions": [
+    "项目选用 TypeScript 或可机器生成的 API Schema",
+    "接口变化有 CI 检查"
+  ],
+  "anti_patterns": [
+    "以类型断言绕开运行时参数校验",
+    "把 TypeScript 编译通过误当作授权安全"
+  ],
+  "verify": [
+    "运行类型检查并复核公共 API 契约",
+    "向 API 传入违反 schema 的请求并确认服务端拒绝"
+  ],
+  "phase": "P3",
+  "provenance": {
+    "observed_at": "2026-11-04",
+    "revision": "unversioned mutable README",
+    "locator": "README > T3 Axioms > Typesafety Isn't Optional"
+  },
+  "notes": "从官方仓库 README 的公开原则概括，不代表对某个具体 commit 的逐行复审。"
+}
