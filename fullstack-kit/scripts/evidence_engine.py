@@ -23,7 +23,8 @@ _STATE_DIRS = {_CONTROL / name for name in ("checks", "evidence", "evidence-v2",
 _STATE_FILES = {(_CONTROL / "workflow.sqlite3"), (_CONTROL / "evidence-v2/index.sqlite3")}
 _DATABASE_FILES = {path.with_name(path.name + suffix) for path in _STATE_FILES
                    for suffix in ("", "-wal", "-shm", "-journal")}
-_SIGNATURES = {_CONTROL / "origin" / f"P{i}.sig" for i in range(8)}
+_SIGNATURES = {_CONTROL / "origin" / f"P{i}{suffix}" for i in range(8)
+               for suffix in (".sig", ".attestation.json", ".runner.sig", ".reviewer.sig")}
 _OUTPUT_NAMES = {
     _CONTROL / "locks": re.compile(r"(?:workflow|[0-9a-f]{64})[.]lock"),
     _CONTROL / "evidence": re.compile(r"P[0-7]-(?:test|build|lint|security)-[0-9a-f]{32}[.]json"),
@@ -32,6 +33,8 @@ _OUTPUT_NAMES = {
 
 
 def managed_path(relative):
+    if relative == Path(".fullstack/artifacts") or Path(".fullstack/artifacts") in relative.parents:
+        return True
     if relative in _DATABASE_FILES or relative in _SIGNATURES or relative == _GIT or _GIT in relative.parents:
         return True
     pattern = _OUTPUT_NAMES.get(relative.parent)
@@ -203,6 +206,17 @@ def valid_evidence(project, phase, kind, scope=None, check_id=None, expected_com
             for field in ['run_id','check_id','seq','phase','kind','scope','source_hash','command_hash']:
                 if receipt.get(field) != row[field]: return False
             if receipt.get('input_policy') != INPUT_POLICY or receipt.get('schema_version') != 2 or receipt.get('exit_code') != 0 or receipt.get('timed_out') is not False or receipt.get('source_unchanged') is not True: return False
+            if receipt.get("environment") is not None:
+                from execution_environment import environment_matches
+                if receipt.get("environment_mode", "CURRENT_ENV_CHECK") == "CURRENT_ENV_CHECK":
+                    if not environment_matches(project, receipt["command"], receipt["check_id"], receipt["environment"]):
+                        return False
+                elif receipt.get("environment_mode") != "ATTESTED_BUILD_ARTIFACT":
+                    return False
+            if receipt.get("artifact") is not None:
+                from artifacts import verify
+                if not verify(project, receipt["artifact"]):
+                    return False
             log = (project / receipt['log']).resolve()
             if not log.is_relative_to(project / '.fullstack/checks'): return False
             if digest(log.read_bytes()) != receipt['log_sha256']: return False

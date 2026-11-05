@@ -1,5 +1,6 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "evidence_schema": 2,
-  "baseline_commit": "9861d761c7cbcfbc3dd75742478d54aee0bac9f2"
+  "baseline_commit": "c7827373224ebba7bd612f2f8045df8c580ebe92",
+  "attestation_schema": "1.3"
 }

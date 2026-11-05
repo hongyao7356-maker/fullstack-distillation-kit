@@ -76,21 +76,16 @@ class PolicyGateTests(unittest.TestCase):
     def test_production_scope_needs_independent_signature(self):
         (self.meta/"origin").mkdir()
         self.config("P6","build")
+        config=json.loads((self.meta/"checks.json").read_text())
+        config["P6"][0].update(candidate_id="candidate",runner_id="test-platform",
+            outputs=[dict(path="dist",type="directory",max_bytes=1024,max_files=10)])
+        (self.meta/"checks.json").write_text(json.dumps(config))
+        (self.root/"qa.js").write_text("const fs=require('fs'); fs.mkdirSync('dist'); fs.writeFileSync('dist/app.js','built');")
         self.execute("P6","build","production_release")
         self.both("P6","UNVERIFIED_PRODUCTION_ORIGIN")
-        import gate_policy
-        # Test-only reviewer key, outside the simulated project.
-        base = self.root.parent
-        key = base/"reviewer"
-        subprocess.run(["ssh-keygen","-q","-t","ed25519","-N","","-f",str(key)],check=True)
-        trusted = base/"allowed_signers"
-        trusted.write_text("reviewer "+key.with_suffix(".pub").read_text())
-        payload = base/"review-payload"
-        payload.write_bytes(gate_policy.attestation_payload(self.root,"P6"))
-        subprocess.run(["ssh-keygen","-Y","sign","-f",str(key),"-n","fullstack-origin-v1",str(payload)],check=True)
-
-        payload.with_suffix(".sig").rename(self.meta/"origin/P6.sig")
-        with patch.object(gate_policy,"SIGNERS",trusted):
-            self.assertEqual([],requirements(self.root,"P6"))
-            self.execute("P6","build","production_release")
-            self.both("P6","UNVERIFIED_PRODUCTION_ORIGIN")
+        from fixture_platform_v13 import platform
+        sign, _ = platform(self)
+        sign(self.root, "P6")
+        self.assertEqual([],requirements(self.root,"P6"))
+        self.execute("P6","build","production_release")
+        self.both("P6","UNVERIFIED_PRODUCTION_ORIGIN")

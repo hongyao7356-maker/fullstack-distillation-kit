@@ -107,8 +107,14 @@ def policy_issues(project, phase, required, require_config=False):
             profile = json.loads((project/".fullstack/profile.json").read_text(encoding="utf-8"))
             if profile.get("evidence_origin") != "real_project" or profile.get("production_deploy_authorized") is not True:
                 issues.append("PRODUCTION_AUTHORIZATION_REQUIRED")
-        if items and not issues and not trusted_origin(project,phase):
-            issues.append("UNVERIFIED_PRODUCTION_ORIGIN" if production else "UNVERIFIED_EXECUTION_INPUTS")
+        if items and not issues:
+            if production or any(item.get('contract_version') == '1.3' for item in items):
+                from attestation_v13 import trusted_phase
+                trusted = trusted_phase(project, phase)
+            else:
+                trusted = trusted_origin(project, phase)
+            if not trusted:
+                issues.append("UNVERIFIED_PRODUCTION_ORIGIN" if production else "UNVERIFIED_EXECUTION_INPUTS")
         return issues
     except (OSError,ValueError,TypeError,AttributeError):
         return ["INVALID_CHECK_CONFIG"]

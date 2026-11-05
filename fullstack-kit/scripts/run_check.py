@@ -21,6 +21,25 @@ ALLOW = {"py", "python", "python3", "pytest", "npm", "npx", "pnpm", "node", "uv"
 KINDS = {"test", "lint", "build", "security"}
 
 
+def check_configuration(project, phase, check_id):
+    path = project / ".fullstack/checks.json"
+    if not path.exists():
+        return {}
+    config = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(config, dict):
+        raise ValueError("Invalid checks configuration")
+    items = config.get(phase, [])
+    if not isinstance(items, list):
+        raise ValueError("Invalid phase configuration")
+    matches = [item for item in items if isinstance(item, dict) and item.get("check_id") == check_id]
+    if len(matches) > 1:
+        raise ValueError("Duplicate check identity")
+    item = matches[0] if matches else {}
+    if not isinstance(item.get("environment", {}), dict):
+        raise ValueError("Invalid environment configuration")
+    return item
+
+
 def allowed_command(cmd:list[str])->bool:
     if not cmd: return False
     exe = Path(cmd[0]).name.lower().removesuffix(".exe").removesuffix(".cmd")
@@ -50,6 +69,7 @@ def _run(project:Path,phase:str,kind:str,command:list[str],timeout:int=120,check
     if not re.fullmatch(r"P[0-7]",phase): raise ValueError("Invalid phase")
     if kind not in KINDS: raise ValueError("Invalid check kind")
     safe_command,secret_rejected=secure_command(command)
+    started_utc = dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
     (project/".fullstack"/"checks").mkdir(parents=True,exist_ok=True)
     (project/".fullstack"/"evidence").mkdir(parents=True,exist_ok=True)
     execution=begin(project,phase,kind,safe_command,check_id,scope)
@@ -59,10 +79,20 @@ def _run(project:Path,phase:str,kind:str,command:list[str],timeout:int=120,check
     metadata=project/".fullstack"/"evidence"/(tag+".json")
     image_unchanged = False
     result_image_hash = None
+    environment = None
+    artifact = None
+    configuration = {}
     if secret_rejected or not allowed_command(command):
         stdout,returncode,timed_out="[COMMAND REJECTED: secret arguments or unsupported command]",126,False
     else:
         try:
+            configuration = check_configuration(project, phase, execution["check_id"])
+            controlled = scope != "tool_selftest" or "environment" in configuration
+            if controlled:
+                from execution_environment import capture_environment
+                child_env, environment = capture_environment(project, command, execution["check_id"])
+            else:
+                child_env = None
             # Validate the tool against the original project before changing cwd.
             resolve(command, project)
             with tempfile.TemporaryDirectory(prefix="fullstack-input-") as temp:
@@ -84,7 +114,7 @@ def _run(project:Path,phase:str,kind:str,command:list[str],timeout:int=120,check
                     elif ".." in path.parts or managed_path(path):
                         raise ValueError("Outside execution image")
                     args.append(arg)
-                stdout, returncode, timed_out = execute(args, image, timeout)
+                stdout, returncode, timed_out = execute(args, image, timeout, env=child_env)
                 result_entries = {}
                 result_image_hash = snapshot(image, identity=project, project_entries=result_entries)
                 image_unchanged = before == result_image_hash
@@ -97,6 +127,15 @@ def _run(project:Path,phase:str,kind:str,command:list[str],timeout:int=120,check
                         and original_entries.items() <= result_entries.items()
                         and all(name.startswith(("dist/", "build/")) for name in added)
                     )
+                if controlled:
+                    from execution_environment import environment_matches
+                    image_unchanged = image_unchanged and environment_matches(
+                        project, command, execution["check_id"], environment)
+                if returncode == 0 and not timed_out and image_unchanged and configuration.get("outputs"):
+                    from artifacts import publish
+                    if kind != "build":
+                        raise ValueError("Only build checks publish artifacts")
+                    artifact = publish(project, image, execution["run_id"], configuration["outputs"])
         except (ValueError, OSError):
             stdout, returncode, timed_out = "[COMMAND FAILED TO START: unsafe or unavailable input]", 127, False
     # The command output may contain sensitive data; redact obvious token/password pairs.
@@ -106,6 +145,11 @@ def _run(project:Path,phase:str,kind:str,command:list[str],timeout:int=120,check
     record={"result_image_hash":result_image_hash,"input_assurance":"local_image_only","image_unchanged":image_unchanged,"schema_version":1,"phase":phase,"kind":kind,"command":safe_command,"run_at_utc":now,
             "log":log.relative_to(project).as_posix(),"log_sha256":digest,"exit_code":returncode,"timed_out":timed_out,
             "warning":"Log hash proves local file consistency only, not command authenticity or business correctness."}
+    record.update(contract_version="1.3", environment=environment, artifact=artifact,
+                  candidate_id=configuration.get("candidate_id", "default"),
+                  environment_mode=configuration.get("environment", {}).get("mode", "CURRENT_ENV_CHECK"),
+                  started_utc=started_utc,
+                  finished_utc=dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"))
     metadata=finish(project,execution,record)
     return record,metadata
 

@@ -10,14 +10,15 @@ import subprocess
 import sys
 
 
-def resolve(command, project):
+def resolve(command, project, env=None):
     exe = Path(command[0]).name.lower().removesuffix('.exe').removesuffix('.cmd')
-    found = shutil.which(command[0])
+    search_path = env.get('PATH', '') if env is not None else None
+    found = shutil.which(command[0], path=search_path)
     if not found: raise OSError('Executable unavailable')
     target = Path(found).resolve()
     if target.is_relative_to(project): raise ValueError('Project-local executables are not trusted tools')
     if exe in {'npm', 'npx'}:
-        node = shutil.which('node')
+        node = shutil.which('node', path=search_path)
         if not node: raise OSError('Node unavailable')
         candidates = [target.parent / 'node_modules/npm/bin' / (exe + '-cli.js'),
                       target.parent.parent / 'lib/node_modules/npm/bin' / (exe + '-cli.js')]
@@ -66,13 +67,23 @@ class WindowsJob:
             self.k.CloseHandle(self.handle); self.handle=None
 
 
-def execute(command, project, timeout):
+def execute(command, project, timeout, env=None):
     job=None; process=None
     try:
-        resolved=resolve(command,project)
+        resolved=resolve(command,project,env=env)
+        controlled = env is not None
+        if controlled and Path(resolved[0]).name.lower().startswith("python"):
+            if Path(resolved[0]).resolve() != Path(sys.executable).resolve():
+                raise ValueError("Unbound Python installation")
+            resolved.insert(1, "-S")
         if os.name=='nt': job=WindowsJob()
-        env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1', PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
-        process=subprocess.Popen([sys.executable,str(Path(__file__).with_name('command_worker.py'))],
+        if env is None:
+            env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1', PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
+        else:
+            env=dict(env)
+        worker = [sys.executable, *(["-S"] if controlled else []),
+                  str(Path(__file__).with_name('command_worker.py'))]
+        process=subprocess.Popen(worker,
             cwd=project,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
             start_new_session=os.name!='nt')
         if job: job.assign(process)
