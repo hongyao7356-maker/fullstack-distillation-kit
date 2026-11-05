@@ -1,0 +1,81 @@
+test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) ... 
+  test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='unknown option') ... FAIL
+  test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='invalid phase') ... FAIL
+  test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='invalid kind') ... FAIL
+  test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='invalid timeout') ... FAIL
+  test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='missing separator') ... FAIL
+  test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='empty command') ... FAIL
+test_valid_command_redacts_and_writes_receipt (test_parser_v12.ParserSecurity.test_valid_command_redacts_and_writes_receipt) ... ok
+
+======================================================================
+FAIL: test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='unknown option')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_parser_v12.py", line 31, in test_invalid_arguments_leave_no_trace
+    self.assertFalse(marker.encode() in result.stderr + result.stdout, "raw input echoed")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : raw input echoed
+
+======================================================================
+FAIL: test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='invalid phase')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_parser_v12.py", line 31, in test_invalid_arguments_leave_no_trace
+    self.assertFalse(marker.encode() in result.stderr + result.stdout, "raw input echoed")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : raw input echoed
+
+======================================================================
+FAIL: test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='invalid kind')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_parser_v12.py", line 31, in test_invalid_arguments_leave_no_trace
+    self.assertFalse(marker.encode() in result.stderr + result.stdout, "raw input echoed")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : raw input echoed
+
+======================================================================
+FAIL: test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='invalid timeout')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_parser_v12.py", line 31, in test_invalid_arguments_leave_no_trace
+    self.assertFalse(marker.encode() in result.stderr + result.stdout, "raw input echoed")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : raw input echoed
+
+======================================================================
+FAIL: test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='missing separator')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_parser_v12.py", line 32, in test_invalid_arguments_leave_no_trace
+    self.assertEqual(list(Path(tmp).iterdir()), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [WindowsPath('C:/Users/hp/AppData/Local/Temp/tmpi71vm71n/.fullstack')] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+WindowsPath('C:/Users/hp/AppData/Local/Temp/tmpi71vm71n/.fullstack')
+
+- [WindowsPath('C:/Users/hp/AppData/Local/Temp/tmpi71vm71n/.fullstack')]
++ []
+
+======================================================================
+FAIL: test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) (case='empty command')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_parser_v12.py", line 32, in test_invalid_arguments_leave_no_trace
+    self.assertEqual(list(Path(tmp).iterdir()), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [WindowsPath('C:/Users/hp/AppData/Local/Temp/tmpg0ev_g15/.fullstack')] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+WindowsPath('C:/Users/hp/AppData/Local/Temp/tmpg0ev_g15/.fullstack')
+
+- [WindowsPath('C:/Users/hp/AppData/Local/Temp/tmpg0ev_g15/.fullstack')]
++ []
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.984s
+
+FAILED (failures=6)

@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+from gate_policy import policy_issues
 
 PLACEHOLDERS=("TO_BE_CONFIRMED", "TODO: FILL", "待填写", "请在这里填写")
 
@@ -22,15 +23,14 @@ def evidence_ok(project:Path,phase:str,kind:str)->bool:
     return valid_evidence(project,phase,kind)
 
 
-def check_gate(project:Path,phase:str,policy:dict)->list[str]:
+def check_gate(project:Path,phase:str,policy:dict,require_config=False)->list[str]:
     project=project.resolve()
     if phase not in policy: raise ValueError("invalid phase")
     issues=[]
     for name in policy[phase]["docs"]:
         p=project/".fullstack"/"docs"/name
         if not good_doc(p): issues.append("Missing/short/placeholder document: "+p.relative_to(project).as_posix())
-    for kind in policy[phase]["checks"]:
-        if not evidence_ok(project,phase,kind): issues.append("Missing/failed/tampered QA receipt: "+kind)
+    issues.extend(policy_issues(project, phase, policy[phase]["checks"], require_config))
     return issues
 
 

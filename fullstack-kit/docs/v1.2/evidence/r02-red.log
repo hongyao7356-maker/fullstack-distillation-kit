@@ -1,0 +1,44 @@
+test_current_identity_and_command_and_snapshot (test_policy_v12.PolicyGateTests.test_current_identity_and_command_and_snapshot) ... FAIL
+test_missing_kind_and_mixed_scopes (test_policy_v12.PolicyGateTests.test_missing_kind_and_mixed_scopes) ... FAIL
+test_production_scope_needs_independent_signature (test_policy_v12.PolicyGateTests.test_production_scope_needs_independent_signature) ... FAIL
+
+======================================================================
+FAIL: test_current_identity_and_command_and_snapshot (test_policy_v12.PolicyGateTests.test_current_identity_and_command_and_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_policy_v12.py", line 55, in test_current_identity_and_command_and_snapshot
+    self.both("P4","INVALID_CHECK_EVIDENCE")
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_policy_v12.py", line 42, in both
+    self.assertTrue(any(issue in msg for msg in result),result)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_missing_kind_and_mixed_scopes (test_policy_v12.PolicyGateTests.test_missing_kind_and_mixed_scopes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_policy_v12.py", line 49, in test_missing_kind_and_mixed_scopes
+    self.both(phase,"MISSING_REQUIRED_CHECK_CONFIG")
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_policy_v12.py", line 42, in both
+    self.assertTrue(any(issue in msg for msg in result),result)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+======================================================================
+FAIL: test_production_scope_needs_independent_signature (test_policy_v12.PolicyGateTests.test_production_scope_needs_independent_signature)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_policy_v12.py", line 66, in test_production_scope_needs_independent_signature
+    self.both("P6","UNVERIFIED_PRODUCTION_ORIGIN")
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_policy_v12.py", line 42, in both
+    self.assertTrue(any(issue in msg for msg in result),result)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : []
+
+----------------------------------------------------------------------
+Ran 3 tests in 2.652s
+
+FAILED (failures=3)

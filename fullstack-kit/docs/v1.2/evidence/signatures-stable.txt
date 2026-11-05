@@ -1,0 +1,11 @@
+test_current_identity_and_command_and_snapshot (test_policy_v12.PolicyGateTests.test_current_identity_and_command_and_snapshot) ... ok
+test_help_exit_zero_is_not_build_evidence (test_policy_v12.PolicyGateTests.test_help_exit_zero_is_not_build_evidence) ... ok
+test_missing_kind_and_mixed_scopes (test_policy_v12.PolicyGateTests.test_missing_kind_and_mixed_scopes) ... ok
+test_production_scope_needs_independent_signature (test_policy_v12.PolicyGateTests.test_production_scope_needs_independent_signature) ... Signing file C:\Users\hp\AppData\Local\Temp\tmp28f0fsw6\review-payload
+Write signature to C:\Users\hp\AppData\Local\Temp\tmp28f0fsw6\review-payload.sig
+ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 6.747s
+
+OK

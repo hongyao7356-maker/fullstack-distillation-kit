@@ -1,0 +1,56 @@
+test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) ... 
+  test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) (folder='.fullstack/local-tests') ... FAIL
+  test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) (folder='node_modules/nested') ... FAIL
+  test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) (folder='.venv/config') ... FAIL
+test_indirect_project_module_and_runtime_config (test_inputs_v12.ExecutionInputs.test_indirect_project_module_and_runtime_config) ... FAIL
+test_link_into_excluded_directory_fails_closed (test_inputs_v12.ExecutionInputs.test_link_into_excluded_directory_fails_closed) ... FAIL
+
+======================================================================
+FAIL: test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) (folder='.fullstack/local-tests')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_inputs_v12.py", line 33, in test_excluded_discovery_and_transitive_inputs
+    self.assertFalse(valid_evidence(self.root, "P4", "test"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) (folder='node_modules/nested')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_inputs_v12.py", line 33, in test_excluded_discovery_and_transitive_inputs
+    self.assertFalse(valid_evidence(self.root, "P4", "test"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) (folder='.venv/config')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_inputs_v12.py", line 33, in test_excluded_discovery_and_transitive_inputs
+    self.assertFalse(valid_evidence(self.root, "P4", "test"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_indirect_project_module_and_runtime_config (test_inputs_v12.ExecutionInputs.test_indirect_project_module_and_runtime_config)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_inputs_v12.py", line 45, in test_indirect_project_module_and_runtime_config
+    self.assertFalse(valid_evidence(self.root, "P4", "test"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_link_into_excluded_directory_fails_closed (test_inputs_v12.ExecutionInputs.test_link_into_excluded_directory_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\hp\Documents\Codex\2026-11-05\du\fullstack-kit\tests\test_inputs_v12.py", line 57, in test_link_into_excluded_directory_fails_closed
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.538s
+
+FAILED (failures=5)

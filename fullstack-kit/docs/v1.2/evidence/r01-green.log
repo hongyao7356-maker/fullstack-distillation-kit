@@ -1,0 +1,10 @@
+test_build_must_preserve_preexisting_outputs (test_inputs_v12.ExecutionInputs.test_build_must_preserve_preexisting_outputs) ... ok
+test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) ... ok
+test_indirect_project_module_and_runtime_config (test_inputs_v12.ExecutionInputs.test_indirect_project_module_and_runtime_config) ... ok
+test_link_into_excluded_directory_fails_closed (test_inputs_v12.ExecutionInputs.test_link_into_excluded_directory_fails_closed) ... ok
+test_npm_build_creates_dist_without_changing_project_inputs (test_inputs_v12.ExecutionInputs.test_npm_build_creates_dist_without_changing_project_inputs) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.979s
+
+OK

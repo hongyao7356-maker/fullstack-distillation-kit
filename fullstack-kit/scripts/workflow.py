@@ -61,27 +61,12 @@ def append(project,event):
 
 def requirements(project,phase):
     validate_phase(phase);project=Path(project).resolve();rules=policy()
-    issues=check_gate(project,phase,rules)
+    issues=check_gate(project,phase,rules,require_config=True)
     try:
         profile=json.loads((project/'.fullstack/profile.json').read_text(encoding='utf-8'))
-        config=json.loads((project/'.fullstack/checks.json').read_text(encoding='utf-8'))
-        configured=config.get(phase)
-        if not isinstance(configured,list) or not configured:raise ValueError('Configure at least one explicit project check for each phase')
-        scope='production_release' if phase in {'P6','P7'} else 'project_acceptance'
-        for item in configured:
-            if not isinstance(item,dict) or not isinstance(item.get('check_id'),str) or item.get('kind') not in {'test','lint','build','security'}:
-                raise ValueError('Invalid check configuration')
-            command=item.get('command')
-            if not isinstance(command,list) or not command or not all(isinstance(x,str) for x in command):
-                raise ValueError('Every check requires its exact command argument list')
-            if not valid_evidence(project,phase,item['kind'],scope=scope,check_id=item['check_id'],expected_command=command):
-                issues.append('Invalid/expired/wrong-scope check: '+item['check_id'])
         if phase=='P0':
             if profile.get('owner_decisions_pending') or not profile.get('users') or not profile.get('goal') or profile.get('goal')=='TO_BE_CONFIRMED':
                 issues.append('Business requirements unresolved')
-        if phase in {'P6','P7'}:
-            if profile.get('evidence_origin')!='real_project' or profile.get('production_deploy_authorized') is not True:
-                issues.append('Production requires real-project origin and explicit owner authorization')
     except (OSError,ValueError,TypeError,KeyError,AttributeError) as exc:
         issues.append('Invalid/missing project configuration: '+redact(str(exc)))
     return issues
@@ -112,6 +97,7 @@ def approve(project,phase,actor,expected_context,human_confirmed=False,productio
     if not human_confirmed or not actor.strip():raise ValueError('Explicit human confirmation required')
     if phase in {'P6','P7'} and not production_authorized:raise ValueError('Separate production authorization required')
     with file_lock(project/'.fullstack/locks/workflow.lock'):
+        if context_hash(project,phase)!=expected_context:raise ValueError('Approval context changed')
         prerequisites(project,phase)
         if context_hash(project,phase)!=expected_context:raise ValueError('Approval context changed')
         append(project,{'phase':phase,'state':'approved','actor':redact(actor),'context':expected_context,
@@ -121,9 +107,11 @@ def approve(project,phase,actor,expected_context,human_confirmed=False,productio
 def advance(project,phase):
     project=Path(project).resolve();validate_phase(phase)
     with file_lock(project/'.fullstack/locks/workflow.lock'):
+        context=context_hash(project,phase)
         prerequisites(project,phase)
         if status(project)[phase]!='approved':raise ValueError('Current human approval required')
-        append(project,{'phase':phase,'state':'complete','context':context_hash(project,phase)})
+        if context_hash(project,phase)!=context or requirements(project,phase):raise ValueError('Approval context changed')
+        append(project,{'phase':phase,'state':'complete','context':context})
 
 
 def main():

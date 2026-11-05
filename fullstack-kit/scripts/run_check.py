@@ -10,11 +10,12 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import sys
 import uuid
-from command_executor import execute
+from command_executor import execute, resolve
 from security import secure_command,redact
-from evidence_engine import begin, finish, file_lock, atomic_write
+from evidence_engine import begin, finish, file_lock, atomic_write, managed_path, snapshot
 
 ALLOW = {"py", "python", "python3", "pytest", "npm", "npx", "pnpm", "node", "uv", "ruff", "mypy", "tsc"}
 KINDS = {"test", "lint", "build", "security"}
@@ -56,15 +57,53 @@ def _run(project:Path,phase:str,kind:str,command:list[str],timeout:int=120,check
     tag=f"{phase}-{kind}-{now}-{uuid.uuid4().hex[:8]}"
     log=project/".fullstack"/"checks"/(tag+".log")
     metadata=project/".fullstack"/"evidence"/(tag+".json")
+    image_unchanged = False
+    result_image_hash = None
     if secret_rejected or not allowed_command(command):
         stdout,returncode,timed_out="[COMMAND REJECTED: secret arguments or unsupported command]",126,False
     else:
-        stdout,returncode,timed_out=execute(command,project,timeout)
+        try:
+            # Validate the tool against the original project before changing cwd.
+            resolve(command, project)
+            with tempfile.TemporaryDirectory(prefix="fullstack-input-") as temp:
+                image = Path(temp).resolve()
+                if image.is_relative_to(project):
+                    raise ValueError("Execution image must be outside project")
+                original_entries = {}
+                before = snapshot(project, destination=image, project_entries=original_entries)
+                if before != execution["source_hash"]:
+                    raise ValueError("Input changed during image creation")
+                args = [command[0]]
+                for arg in command[1:]:
+                    path = Path(arg)
+                    if path.is_absolute():
+                        relative = path.resolve().relative_to(project)
+                        if managed_path(relative):
+                            raise ValueError("Managed runtime input")
+                        arg = str(image / relative)
+                    elif ".." in path.parts or managed_path(path):
+                        raise ValueError("Outside execution image")
+                    args.append(arg)
+                stdout, returncode, timed_out = execute(args, image, timeout)
+                result_entries = {}
+                result_image_hash = snapshot(image, identity=project, project_entries=result_entries)
+                image_unchanged = before == result_image_hash
+                if kind == "build" and not image_unchanged:
+                    # Additional build outputs may live only beneath these roots.
+                    # Existing inputs (including existing dist files) remain bound.
+                    added = result_entries.keys() - original_entries.keys()
+                    image_unchanged = (
+                        bool(added)
+                        and original_entries.items() <= result_entries.items()
+                        and all(name.startswith(("dist/", "build/")) for name in added)
+                    )
+        except (ValueError, OSError):
+            stdout, returncode, timed_out = "[COMMAND FAILED TO START: unsafe or unavailable input]", 127, False
     # The command output may contain sensitive data; redact obvious token/password pairs.
     stdout=redact(stdout)
     atomic_write(log,stdout.encode("utf-8"))
     digest=hashlib.sha256(log.read_bytes()).hexdigest()
-    record={"schema_version":1,"phase":phase,"kind":kind,"command":safe_command,"run_at_utc":now,
+    record={"result_image_hash":result_image_hash,"input_assurance":"local_image_only","image_unchanged":image_unchanged,"schema_version":1,"phase":phase,"kind":kind,"command":safe_command,"run_at_utc":now,
             "log":log.relative_to(project).as_posix(),"log_sha256":digest,"exit_code":returncode,"timed_out":timed_out,
             "warning":"Log hash proves local file consistency only, not command authenticity or business correctness."}
     metadata=finish(project,execution,record)
@@ -80,8 +119,16 @@ def run(project,phase,kind,command,timeout=120,check_id=None,scope="tool_selftes
         return _run(project,phase,kind,command,timeout,check_id,scope)
 
 
+class SafeArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        # argparse messages can embed any supplied value, including unlabeled secrets.
+        self.print_usage(sys.stderr)
+        self.exit(2, "Invalid QA runner arguments. See run_check.py --help.\n")
+
+
 def main():
-    p=argparse.ArgumentParser(description="Restricted QA command runner with evidence receipts")
+    p=SafeArgumentParser(prog="run_check.py", allow_abbrev=False,
+                         description="Restricted QA command runner with evidence receipts")
     p.add_argument("--project",default=".")
     p.add_argument("--phase",required=True,choices=[f"P{i}" for i in range(8)])
     p.add_argument("--kind",required=True,choices=sorted(KINDS))
@@ -90,11 +137,15 @@ def main():
     p.add_argument("--timeout",type=int,default=120)
     p.add_argument("cmd",nargs=argparse.REMAINDER,help="after --, QA command")
     a=p.parse_args()
-    command=a.cmd[1:] if a.cmd and a.cmd[0]=="--" else a.cmd
+    if len(a.cmd) < 2 or a.cmd[0] != "--":
+        p.error("Expected -- followed by a command")
+    command=a.cmd[1:]
     if not 1 <= a.timeout <= 3600: p.error("timeout must be 1..3600 seconds")
+    if a.check_id is not None and not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", a.check_id):
+        p.error("Invalid check identity")
     try: receipt,path=run(Path(a.project),a.phase,a.kind,command,a.timeout,a.check_id,a.scope)
-    except (ValueError,OSError) as exc: p.error(redact(str(exc)))
-    print("Exit code:",receipt["exit_code"],"evidence:",path)
+    except (ValueError,OSError): p.error("QA runner rejected the request")
+    print("Exit code:",receipt["exit_code"],"evidence:",redact(str(path)))
     print("Log: ",receipt["log"])
     raise SystemExit(0 if receipt["exit_code"]==0 else 2)
 

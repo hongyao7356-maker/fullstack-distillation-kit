@@ -1,0 +1,56 @@
+test_invalid_inputs_have_located_errors_and_exit_two (test_cards_v11.CardInputIntegration.test_invalid_inputs_have_located_errors_and_exit_two) ... ok
+test_concurrent_same_check_serialized_no_partial_receipts (test_concurrency_v11.EvidenceConcurrencyIntegration.test_concurrent_same_check_serialized_no_partial_receipts) ... ok
+test_damaged_index_fails_closed (test_concurrency_v11.EvidenceConcurrencyIntegration.test_damaged_index_fails_closed) ... ok
+test_interrupted_execution_blocks_old_pass_and_recovers (test_concurrency_v11.EvidenceConcurrencyIntegration.test_interrupted_execution_blocks_old_pass_and_recovers) ... ok
+test_export_conflict_and_portable_verify (test_delivery_v11.DeliveryIntegration.test_export_conflict_and_portable_verify) ... ok
+test_repeat_verify_is_read_only (test_delivery_v11.DeliveryIntegration.test_repeat_verify_is_read_only) ... ok
+test_command_rejection_supersedes_previous_pass (test_evidence_v11.EvidenceRegression.test_command_rejection_supersedes_previous_pass) ... ok
+test_corrupt_latest_never_falls_back (test_evidence_v11.EvidenceRegression.test_corrupt_latest_never_falls_back) ... ok
+test_legacy_receipt_rejected (test_evidence_v11.EvidenceRegression.test_legacy_receipt_rejected) ... ok
+test_pass_fail_pass_latest_only (test_evidence_v11.EvidenceRegression.test_pass_fail_pass_latest_only) ... ok
+test_source_change_invalidates (test_evidence_v11.EvidenceRegression.test_source_change_invalidates) ... ok
+test_source_changes_during_execution_invalidates (test_evidence_v11.EvidenceRegression.test_source_changes_during_execution_invalidates) ... ok
+test_node_absolute_local_script (test_executor_v11.ExecutorIntegration.test_node_absolute_local_script) ... ok
+test_real_npm_test_build_and_cmd (test_executor_v11.ExecutorIntegration.test_real_npm_test_build_and_cmd) ... ok
+test_timeout_kills_descendant (test_executor_v11.ExecutorIntegration.test_timeout_kills_descendant) ... ok
+test_build_must_preserve_preexisting_outputs (test_inputs_v12.ExecutionInputs.test_build_must_preserve_preexisting_outputs) ... ok
+test_excluded_discovery_and_transitive_inputs (test_inputs_v12.ExecutionInputs.test_excluded_discovery_and_transitive_inputs) ... ok
+test_indirect_project_module_and_runtime_config (test_inputs_v12.ExecutionInputs.test_indirect_project_module_and_runtime_config) ... ok
+test_link_into_excluded_directory_fails_closed (test_inputs_v12.ExecutionInputs.test_link_into_excluded_directory_fails_closed) ... ok
+test_npm_build_creates_dist_without_changing_project_inputs (test_inputs_v12.ExecutionInputs.test_npm_build_creates_dist_without_changing_project_inputs) ... ok
+test_bad_card_rejected (test_package.PackTests.test_bad_card_rejected) ... ok
+test_document_placeholder_rejected (test_package.PackTests.test_document_placeholder_rejected) ... ok
+test_gate_accepts_real_docs (test_package.PackTests.test_gate_accepts_real_docs) ... ok
+test_gate_blocks_missing_docs (test_package.PackTests.test_gate_blocks_missing_docs) ... ok
+test_init_idempotent (test_package.PackTests.test_init_idempotent) ... ok
+test_pack_structure (test_package.PackTests.test_pack_structure) ... ok
+test_prevent_traversal_evidence (test_package.PackTests.test_prevent_traversal_evidence) ... ok
+test_qa_allowlist (test_package.PackTests.test_qa_allowlist) ... ok
+test_run_records_and_tamper_detects (test_package.PackTests.test_run_records_and_tamper_detects) ... ok
+test_source_cards (test_package.PackTests.test_source_cards) ... ok
+test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) ... ok
+test_valid_command_redacts_and_writes_receipt (test_parser_v12.ParserSecurity.test_valid_command_redacts_and_writes_receipt) ... ok
+test_current_identity_and_command_and_snapshot (test_policy_v12.PolicyGateTests.test_current_identity_and_command_and_snapshot) ... ok
+test_help_exit_zero_is_not_build_evidence (test_policy_v12.PolicyGateTests.test_help_exit_zero_is_not_build_evidence) ... ok
+test_missing_kind_and_mixed_scopes (test_policy_v12.PolicyGateTests.test_missing_kind_and_mixed_scopes) ... ok
+test_production_scope_needs_independent_signature (test_policy_v12.PolicyGateTests.test_production_scope_needs_independent_signature) ... Signing file C:\Users\hp\AppData\Local\Temp\tmp435wllun\review-payload
+Write signature to C:\Users\hp\AppData\Local\Temp\tmp435wllun\review-payload.sig
+ok
+test_export_inside_source_rejected (test_review_v11.IndependentReviewRegression.test_export_inside_source_rejected) ... ok
+test_private_key_output_redacted (test_review_v11.IndependentReviewRegression.test_private_key_output_redacted) ... ok
+test_quoted_and_bearer_secret_output_redacted (test_review_v11.IndependentReviewRegression.test_quoted_and_bearer_secret_output_redacted) ... ok
+test_required_command_cannot_be_substituted (test_review_v11.IndependentReviewRegression.test_required_command_cannot_be_substituted) ... ok
+test_sanitized_json_remains_parseable (test_review_v11.IndependentReviewRegression.test_sanitized_json_remains_parseable) ... ok
+test_work_directory_is_source (test_review_v11.IndependentReviewRegression.test_work_directory_is_source) ... ok
+test_known_environment_secret_stdout_stderr_redacted (test_security_v11.SecurityIntegration.test_known_environment_secret_stdout_stderr_redacted) ... ok
+test_secret_argument_not_persisted (test_security_v11.SecurityIntegration.test_secret_argument_not_persisted) ... ok
+test_missing_phases_and_unapproved_transition (test_workflow_v11.WorkflowE2E.test_missing_phases_and_unapproved_transition) ... ok
+test_noninteractive_approval_denied (test_workflow_v11.WorkflowE2E.test_noninteractive_approval_denied) ... ok
+test_real_evidence_approval_and_source_invalidation (test_workflow_v11.WorkflowE2E.test_real_evidence_approval_and_source_invalidation) ... ok
+test_sequential_p0_to_p5_then_production_blocked (test_workflow_v11.WorkflowE2E.test_sequential_p0_to_p5_then_production_blocked) ... ok
+test_synthetic_never_qualifies_for_production (test_workflow_v11.WorkflowE2E.test_synthetic_never_qualifies_for_production) ... ok
+
+----------------------------------------------------------------------
+Ran 49 tests in 37.257s
+
+OK

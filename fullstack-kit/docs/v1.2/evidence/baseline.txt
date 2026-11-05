@@ -1,0 +1,2 @@
+BASELINE_MATCH: 9861d761c7cbcfbc3dd75742478d54aee0bac9f2 (24 file hashes)
+This verifies local baseline identity only; it does not verify the audit claims.

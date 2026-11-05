@@ -8,6 +8,7 @@ KIT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(KIT/'scripts'))
 from init_project import initialize
 from run_check import run
+from fixture_reviewer import fixture_reviewer
 
 class WorkflowE2E(unittest.TestCase):
     def setUp(self):
@@ -41,10 +42,13 @@ class WorkflowE2E(unittest.TestCase):
         config={'P0':[{'check_id':'requirements-test','kind':'test','command':[sys.executable,'-m','unittest','discover','-s','tests']}]}
         (self.root/'.fullstack/checks.json').write_text(json.dumps(config))
         (self.root/'tests').mkdir();(self.root/'tests/test_case.py').write_text('import unittest\nclass T(unittest.TestCase):\n def test_it(self): self.assertEqual(2,1+1)\n')
+        sign=fixture_reviewer(self)
+        (self.root/".fullstack/origin").mkdir(exist_ok=True)
         cmd=[sys.executable,'-m','unittest','discover','-s','tests']
         run(self.root,'P0','test',cmd,check_id='requirements-test',scope='tool_selftest')
         with self.assertRaises(ValueError):approve(self.root,'P0','fixture',context_hash(self.root,'P0'),human_confirmed=True)
         run(self.root,'P0','test',cmd,check_id='requirements-test',scope='project_acceptance')
+        sign(self.root,'P0')
         with self.assertRaises(ValueError):advance(self.root,'P0')
         approve(self.root,'P0','fixture',context_hash(self.root,'P0'),human_confirmed=True)
         advance(self.root,'P0')
@@ -65,16 +69,22 @@ class WorkflowE2E(unittest.TestCase):
         profile={'goal':'isolated workflow engine test','users':['fixture'],'owner_decisions_pending':[],'evidence_origin':'synthetic','production_deploy_authorized':False}
         (self.root/'.fullstack/profile.json').write_text(json.dumps(profile),encoding='utf-8')
         (self.root/'tests').mkdir();(self.root/'tests/test_it.py').write_text('import unittest\nclass T(unittest.TestCase):\n def test_it(self): self.assertEqual(2,1+1)\n',encoding='utf-8')
+        sign=fixture_reviewer(self)
+        (self.root/".fullstack/origin").mkdir(exist_ok=True)
         cmd=[sys.executable,'-m','unittest','discover','-s','tests']
+        lint=["npm","run","lint"]
+        (self.root/"package.json").write_text(json.dumps({"scripts":{"lint":"node --check fixture.js"}}))
+        (self.root/"fixture.js").write_text("const x = 1;")
         config={}
         for phase in rules:
-            config[phase]=[{'check_id':phase+'.'+kind,'kind':kind,'command':cmd} for kind in (rules[phase]['checks'] or ['test'])]
+            config[phase]=[{'check_id':phase+'.'+kind,'kind':kind,'command':lint if kind=='lint' else cmd} for kind in (rules[phase]['checks'] or ['test'])]
             for filename in rules[phase]['docs']:
                 (self.root/'.fullstack/docs'/filename).write_text('SYNTHETIC ORCHESTRATION FIXTURE. NOT BUSINESS ACCEPTANCE. '*10,encoding='utf-8')
         (self.root/'.fullstack/checks.json').write_text(json.dumps(config),encoding='utf-8')
         for i in range(6):
             phase=f'P{i}'
-            for item in config[phase]:run(self.root,phase,item['kind'],cmd,check_id=item['check_id'],scope='project_acceptance')
+            for item in config[phase]:run(self.root,phase,item['kind'],item['command'],check_id=item['check_id'],scope='project_acceptance')
+            sign(self.root,phase)
             approve(self.root,phase,'fixture actor',context_hash(self.root,phase),human_confirmed=True)
             advance(self.root,phase)
         self.assertEqual('complete',status(self.root)['P5'])

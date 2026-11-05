@@ -1,0 +1,27 @@
+{
+  "R01": {
+    "first_exit": 0,
+    "snapshot_unchanged": true,
+    "stale_success_still_valid": true,
+    "actual_changed_test_exit": 1
+  },
+  "R02": {
+    "required_policy_kinds": [
+      "build"
+    ],
+    "configured_project_kinds": [
+      "test"
+    ],
+    "build_receipt_scope": "tool_selftest",
+    "build_exit": 0,
+    "release_test_exit": 0,
+    "build_valid_as_production": false,
+    "static_gate_issues": [],
+    "workflow_requirements_issues": []
+  },
+  "R03": {
+    "exit_code": 2,
+    "fake_secret_printed_in_stderr": true,
+    "location": "argparse error before secure_command; no real credential used"
+  }
+}

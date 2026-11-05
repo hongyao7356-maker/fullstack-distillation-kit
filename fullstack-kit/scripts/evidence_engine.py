@@ -16,28 +16,71 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def snapshot(project):
+INPUT_POLICY = "project-image-v1"
+_GIT = Path(".git")
+_CONTROL = Path(".fullstack")
+_STATE_DIRS = {_CONTROL / name for name in ("checks", "evidence", "evidence-v2", "locks", "origin")}
+_STATE_FILES = {(_CONTROL / "workflow.sqlite3"), (_CONTROL / "evidence-v2/index.sqlite3")}
+_DATABASE_FILES = {path.with_name(path.name + suffix) for path in _STATE_FILES
+                   for suffix in ("", "-wal", "-shm", "-journal")}
+_SIGNATURES = {_CONTROL / "origin" / f"P{i}.sig" for i in range(8)}
+_OUTPUT_NAMES = {
+    _CONTROL / "locks": re.compile(r"(?:workflow|[0-9a-f]{64})[.]lock"),
+    _CONTROL / "evidence": re.compile(r"P[0-7]-(?:test|build|lint|security)-[0-9a-f]{32}[.]json"),
+    _CONTROL / "checks": re.compile(r"P[0-7]-(?:test|build|lint|security)-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}[.]log"),
+}
+
+
+def managed_path(relative):
+    if relative in _DATABASE_FILES or relative in _SIGNATURES or relative == _GIT or _GIT in relative.parents:
+        return True
+    pattern = _OUTPUT_NAMES.get(relative.parent)
+    if pattern:
+        # atomic_write uses a target-specific temporary sibling.
+        target = re.sub(r"[.][0-9a-f]{32}[.]tmp$", "", relative.name)
+        return bool(pattern.fullmatch(target))
+    return False
+
+
+def _raise_walk_error(error):
+    raise error
+
+
+def snapshot(project, *, destination=None, identity=None, project_entries=None):
+    """Hash exactly the project tree made available in the execution image."""
     project = Path(project).resolve()
-    rows = [('project', str(project))]
-    skip = {'.git', '.fullstack', '__pycache__', 'node_modules', '.venv', 'venv'}
-    for folder, dirs, files in os.walk(project, followlinks=False):
+    rows = [("policy", INPUT_POLICY), ("project", str(identity or project))]
+    for folder, dirs, files in os.walk(project, onerror=_raise_walk_error):
         base = Path(folder)
-        for d in dirs:
-            if d not in skip and ((base/d).is_symlink() or getattr(base/d,'is_junction',lambda:False)()):
-                raise ValueError('Source directory links require explicit review')
-        dirs[:] = sorted(d for d in dirs if d not in skip)
+        relative = base.relative_to(project)
+        for name in dirs + files:
+            entry = base / name
+            if entry.is_symlink() or getattr(entry, "is_junction", lambda: False)():
+                raise ValueError("Project input links require explicit review")
+        dirs[:] = sorted(name for name in dirs if not managed_path(relative / name))
+        if relative != Path("."):
+            if relative not in _STATE_DIRS:
+                rows.append((relative.as_posix() + "/", None))
+            if destination is not None:
+                (destination / relative).mkdir()
         for name in sorted(files):
-            p = base / name
-            if p.is_symlink():
-                raise ValueError('Source symlinks require explicit review')
-            if p.suffix in {'.pyc', '.pyo'}: continue
-            rows.append((p.relative_to(project).as_posix(), digest(p.read_bytes())))
-    for name in ['.fullstack/profile.json', '.fullstack/checks.json', 'work/verify_delivery.py']:
-        p = project / name
-        if p.is_file(): rows.append((name, digest(p.read_bytes())))
-    for p in sorted(Path(__file__).parent.glob('*.py')):
-        rows.append(('engine/' + p.name, digest(p.read_bytes())))
-    return digest(json.dumps(rows, ensure_ascii=False, separators=(',', ':')).encode())
+            path = relative / name
+            if managed_path(path):
+                continue
+            data = (project / path).read_bytes()
+            rows.append((path.as_posix(), digest(data)))
+            if destination is not None:
+                copied = destination / path
+                copied.write_bytes(data)
+                copied.chmod((project / path).stat().st_mode)
+    if project_entries is not None:
+        project_entries.update(rows[2:])
+    scripts = Path(__file__).parent
+    for path in sorted(scripts.glob("*.py")):
+        rows.append(("engine/" + path.name, digest(path.read_bytes())))
+    policy = scripts.parent / "templates" / "phase_policy.json"
+    rows.append(("engine/phase_policy.json", digest(policy.read_bytes())))
+    return digest(json.dumps(rows, ensure_ascii=False, separators=(",", ":")).encode())
 
 
 def atomic_write(path, data):
@@ -59,8 +102,8 @@ def file_lock(path, timeout=120):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('a+b') as stream:
-        stream.seek(0, 2)
-        if stream.tell() == 0: stream.write(b'0'); stream.flush()
+        # Windows permits locking beyond EOF. Initializing a byte here races
+        # another process that has already locked that byte.
         deadline = time.monotonic() + timeout
         while True:
             try:
@@ -128,7 +171,8 @@ def begin(project, phase, kind, command, check_id=None, scope='tool_selftest'):
 def finish(project, row, receipt):
     receipt.update({k: row[k] for k in ['run_id', 'check_id', 'seq', 'scope', 'command_hash', 'source_hash']})
     receipt['schema_version'] = 2
-    receipt['source_unchanged'] = snapshot(project) == row['source_hash']
+    receipt['input_policy'] = INPUT_POLICY
+    receipt['source_unchanged'] = receipt.get('image_unchanged') is True and snapshot(project) == row['source_hash']
     path = Path(project) / '.fullstack/evidence' / (row['phase'] + '-' + row['kind'] + '-' + row['run_id'] + '.json')
     data = (json.dumps(receipt, ensure_ascii=False, indent=2) + '\n').encode()
     atomic_write(path, data)
@@ -158,7 +202,7 @@ def valid_evidence(project, phase, kind, scope=None, check_id=None, expected_com
             receipt = json.loads(data)
             for field in ['run_id','check_id','seq','phase','kind','scope','source_hash','command_hash']:
                 if receipt.get(field) != row[field]: return False
-            if receipt.get('schema_version') != 2 or receipt.get('exit_code') != 0 or receipt.get('timed_out') is not False or receipt.get('source_unchanged') is not True: return False
+            if receipt.get('input_policy') != INPUT_POLICY or receipt.get('schema_version') != 2 or receipt.get('exit_code') != 0 or receipt.get('timed_out') is not False or receipt.get('source_unchanged') is not True: return False
             log = (project / receipt['log']).resolve()
             if not log.is_relative_to(project / '.fullstack/checks'): return False
             if digest(log.read_bytes()) != receipt['log_sha256']: return False

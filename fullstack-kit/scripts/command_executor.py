@@ -71,7 +71,7 @@ def execute(command, project, timeout):
     try:
         resolved=resolve(command,project)
         if os.name=='nt': job=WindowsJob()
-        env=dict(os.environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
+        env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1', PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
         process=subprocess.Popen([sys.executable,str(Path(__file__).with_name('command_worker.py'))],
             cwd=project,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
             start_new_session=os.name!='nt')

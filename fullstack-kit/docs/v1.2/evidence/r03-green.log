@@ -1,0 +1,7 @@
+test_invalid_arguments_leave_no_trace (test_parser_v12.ParserSecurity.test_invalid_arguments_leave_no_trace) ... ok
+test_valid_command_redacts_and_writes_receipt (test_parser_v12.ParserSecurity.test_valid_command_redacts_and_writes_receipt) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.462s
+
+OK
